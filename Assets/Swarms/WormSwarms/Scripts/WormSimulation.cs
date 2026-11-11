@@ -1,8 +1,10 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 [DisallowMultipleComponent]
 public class WormSimulation : MonoBehaviour
 {
+    private static List<WormSimulation> AllWorms = new List<WormSimulation>();
 
     [Header("Worm")]
     public int PointCount = 6;
@@ -18,13 +20,17 @@ public class WormSimulation : MonoBehaviour
 
     public int Contstraints = 8;
 
-    [Header("Player Tracking")]
-    public Transform Player;
+    [Header("Swarm Tracking")]
+    public Transform SwarmCenter;
     public float MoveForce = 8f;
     public float MaxSpeed = 2f;
 
     [Header("Collision")]
     public LayerMask World;
+
+    [Header("Worm Separation")]
+    public float SeparationRadius = 0.5f;
+    public float SeparationStrength = 2f;
 
     [Header("Debug Features")]
     public float PointRadius = 0.05f;
@@ -72,11 +78,9 @@ public class WormSimulation : MonoBehaviour
 
             Vector3 Velosity = (Pos[i] - PrePos[i]) * (1f - Damping);
 
-            if(i == 0 && Player != null)
+            if(i == 0 && SwarmCenter != null)
             {
-                Vector3 Dir = Player.position - Pos[0];
-
-                Dir = Vector3.ProjectOnPlane(Dir, Vector3.up);
+                Vector3 Dir = SwarmCenter.position - Pos[0];
 
                 if(Dir.sqrMagnitude > 0.01f)
                 {
@@ -84,6 +88,13 @@ public class WormSimulation : MonoBehaviour
 
                     Velosity += Dir * MoveForce * Timer;
                 }
+            }
+
+            if (i == 0)
+            {
+                Vector3 Separation = CalculateSeparation();
+
+                Velosity += Separation * SeparationStrength * Timer;
             }
 
             Vector3 HoriVelosity = Vector3.ProjectOnPlane(Velosity, Vector3.up);
@@ -133,6 +144,32 @@ public class WormSimulation : MonoBehaviour
         transform.position = Pos[0];
     }
 
+    private Vector3 CalculateSeparation()
+    {
+        Vector3 Separation = Vector3.zero;
+
+        foreach (WormSimulation Other in AllWorms)
+        {
+            if (Other == null || Other == this)
+                continue;
+
+            if (Other.Pos == null || Other.PointCount < 1)
+                continue;
+
+            Vector3 Difference = Pos[0] - Other.Pos[0];
+
+            float Distance = Difference.magnitude;
+
+            if (Distance > 0.001f && Distance < SeparationRadius)
+            {
+                float Strength = 1f - Distance / SeparationRadius;
+
+                Separation += Difference.normalized * Strength;
+            }
+        }
+        return Vector3.ClampMagnitude(Separation, 1f);
+    }
+
     //ChatGPT IM TIRED
     private void ResolveFloorCollision()
     {
@@ -146,6 +183,19 @@ public class WormSimulation : MonoBehaviour
                 PrePos[i].y = PointRadius;
             }
         }
+    }
+
+    private void OnEnable()
+    {
+        if (!AllWorms.Contains(this))
+        {
+            AllWorms.Add(this);
+        }
+    }
+
+    private void OnDisable()
+    {
+        AllWorms.Remove(this);
     }
 
     private void OnDrawGizmos()

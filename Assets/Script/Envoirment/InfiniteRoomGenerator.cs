@@ -48,9 +48,9 @@ public class InfiniteRoomGenerator : MonoBehaviour
 
         GameObject spawnedPlayer = Instantiate(
         player,
-        entry.position + entry.forward * 2f,
+        entry.position + entry.forward * -2f + Vector3.up * 1f,
         entry.rotation
-        );
+    );
 
         spawnedPlayer.name = "Blender Spide";
 

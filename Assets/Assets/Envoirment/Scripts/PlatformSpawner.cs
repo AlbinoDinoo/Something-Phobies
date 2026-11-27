@@ -55,13 +55,9 @@ public class PlatformSpawner : MonoBehaviour
                 {
                     float RandomRotation = Random.Range(0, 4) * 90f;
 
-                    Quaternion Rotation = Quaternion.Euler(
-                        0, RandomRotation, 0
-                    );
+                    Quaternion Rotation = Quaternion.Euler(0, RandomRotation, 0);
 
-                    GameObject Platform = Instantiate(
-                        PlatformPrefab, Position, Rotation
-                    );
+                    GameObject Platform = Instantiate(PlatformPrefab, Position, Rotation, transform);
 
                     SpawnedTiles.Add(Tile, Platform);
                 }

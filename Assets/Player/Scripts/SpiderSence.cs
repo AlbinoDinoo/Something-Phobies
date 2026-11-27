@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class SpiderStatus : MonoBehaviour
+public class SpiderSence : MonoBehaviour
 {
     public Renderer[] StatusRenderers;
     public Light StatusLight;
@@ -10,6 +10,9 @@ public class SpiderStatus : MonoBehaviour
     private float Timer = 0f;
 
     private bool IsInDanger;
+
+    public float DangerDuration = 3f;
+    private float DangerTimer;
 
     void Start()
     {
@@ -21,6 +24,13 @@ public class SpiderStatus : MonoBehaviour
         if (IsInDanger)
         {
             FlickerLight();
+
+            DangerTimer -= Time.deltaTime;
+
+            if (DangerTimer <= 0)
+            {
+                SetNormal();
+            }
         }
 
 
@@ -38,8 +48,13 @@ public class SpiderStatus : MonoBehaviour
 
     public void SetDanger()
     {
-        IsInDanger = true;
-        ChangeColor(Color.red);
+        DangerTimer = DangerDuration;
+
+        if (!IsInDanger)
+        {
+            IsInDanger = true;
+            ChangeColor(Color.red);
+        }
     }
 
     public void SetNormal()

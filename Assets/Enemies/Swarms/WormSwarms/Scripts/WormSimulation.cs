@@ -197,31 +197,4 @@ public class WormSimulation : MonoBehaviour
     {
         AllWorms.Remove(this);
     }
-
-    private void OnDrawGizmos()
-    {
-        return;
-        if (!Application.isPlaying || !Initilized)
-            return;
-
-        for (int i = 0; i < PointCount; i++)
-        {
-            Gizmos.color = i == 0 ? Color.cyan : PointColor;
-
-            Gizmos.DrawSphere(
-                Pos[i],
-                PointRadius
-            );
-
-            if (i < PointCount - 1)
-            {
-                Gizmos.color = LineColor;
-
-                Gizmos.DrawLine(
-                    Pos[i],
-                    Pos[i + 1]
-                );
-            }
-        }
-    }
 }

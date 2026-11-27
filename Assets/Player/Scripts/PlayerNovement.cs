@@ -17,6 +17,7 @@ public class PlayerNovement : MonoBehaviour
 
     void Update()
     {
+        Debug.Log(Time.timeScale);
         MovePlayer();
     }
 
